@@ -1,4 +1,4 @@
-import cards, fields, players
+import cards, fields, players,effects
 
 
 class basicPhilosopher:
@@ -12,10 +12,10 @@ class basicPhilosopher:
     def setPlayer(self, player: players.player):
         self.player = player
 
-    def addEnergy(self, energyCard: cards.energyCard):
+    def addEnergy(self, energyCard):
         self.energyCards.append(energyCard)
 
-    def loseEnergy(self, energyCard: cards.energyCard):
+    def loseEnergy(self, energyCard):
         self.energyCards.remove(energyCard)
 
     def addHP(self, hp: int):

@@ -1,4 +1,4 @@
-import philosophers, cards, fields
+import philosophers, cards, fields,effects
 
 
 class player:
@@ -6,7 +6,7 @@ class player:
         self.name = name
         self.philosophers = []
 
-    def addPhilosopher(self, philosopher: philosophers.testPhilosopher):
+    def addPhilosopher(self, philosopher):
         newPhilosopher = philosopher(self)
         newPhilosopher.setPlayer(self)
         self.philosophers.append(newPhilosopher)
