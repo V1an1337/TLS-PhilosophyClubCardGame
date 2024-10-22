@@ -1,4 +1,4 @@
-import philosophers, fields, players
+import philosophers, fields, players, effects
 
 CardManager = fields.getField().cardManager
 

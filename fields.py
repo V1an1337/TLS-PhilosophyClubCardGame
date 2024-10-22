@@ -1,5 +1,6 @@
 import cards
 import philosophers
+import players
 
 
 class cardManager:
@@ -21,9 +22,26 @@ class cardManager:
 
 class field:
     def __init__(self):
+        self.state = 0  # [0: setup, 1: normal, -1: error]
         self.cardPile: [cards.basicCard] = []
         self.graveYard: [cards.basicCard] = []
         self.cardManager = cardManager()
+
+        self.playerID = 0
+        self.players = []
+
+        self.state = 1
+
+    def __getPlayerID(self):
+        self.playerID += 1
+        return self.playerID
+
+    def addPlayer(self, player: players.player):
+        self.players.append(player)
+        return self.__getPlayerID()
+
+    def getPlayer(self, id):
+        return self.players[id - 1]  # id is 1-indexed
 
 
 Field = field()
