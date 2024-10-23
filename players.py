@@ -1,4 +1,4 @@
-import philosophers, cards, fields,effects
+import philosophers, cards, fields, effects
 
 
 class player:

@@ -16,7 +16,7 @@ class basicCard:
 
 
 class energyCard(basicCard):
-    def __init__(self, philosopher: philosophers.basicPhilosopher, energy):
+    def __init__(self, philosopher: philosophers.basicPhilosopher, energy):  # philosopher 永远放在参数第一位, player同理
         self.name = "energyCard"
         self.description = f"Give you {energy} energy"
         super().__init__(self.name, self.description, philosopher)
