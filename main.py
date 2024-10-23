@@ -37,6 +37,7 @@ def Admin():
             except Exception as e:
                 print(f"Error executing command: {e}")
             command_queue.task_done()
+        print(f"Admin terminal closed.")
 
     def write_commands():
         while True:
