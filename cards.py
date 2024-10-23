@@ -1,6 +1,6 @@
 import philosophers, fields, players, effects
 
-CardManager = fields.getField().cardManager
+CardManager = fields.getField().getCardManager()
 
 
 class basicCard:
@@ -22,8 +22,10 @@ class energyCard(basicCard):
         super().__init__(self.name, self.description, philosopher)
         self.energy = energy
 
-    def use(self):
-        self.philosopher.addEnergy(self)
+    def use(self, target=None):
+        if not target:
+            target = self.philosopher
+        target.addEnergy(self)
 
 
 class hpCard(basicCard):
@@ -33,14 +35,7 @@ class hpCard(basicCard):
         super().__init__(self.name, self.description, philosopher)
         self.hp = hp
 
-    def use(self):
-        self.philosopher.addHP(self.hp)
-
-
-class basicHandCard(basicCard):
-    def __init__(self, name, description, philosopher: philosophers.basicPhilosopher):
-        super(basicHandCard, self).__init__(name, description, philosopher)
-
-    def use(self, target):
-        self.target = target
-        pass
+    def use(self, target=None):
+        if not target:
+            target = self.philosopher
+        target.addHP(self.hp)
