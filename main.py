@@ -61,9 +61,12 @@ async def Judge():
         await asyncio.sleep(1)  # Sleep for a short period to avoid busy waiting
 
     print("Game is over.")
+    server.close()
+    print("Server closed")
 
 
 async def main(port):
+    global server
     # 同时运行WebSocket服务器和Judge函数
     server = await websockets.serve(handle_client, "0.0.0.0", port)
 
