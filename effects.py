@@ -3,7 +3,7 @@ import philosophers
 
 
 class basicEffect:
-    def __init__(self, name, description, philosopher: philosophers.basicPhilosopher):
+    def __init__(self, name, description, philosopher):
         self.name = name
         self.description = description
         self.philosopher = philosopher
