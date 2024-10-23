@@ -30,3 +30,4 @@ class testPhilosopher(basicPhilosopher):
         self.name = "testPhilosopher"
         self.description = "This is a test."
         super().__init__(self.name, description=self.description, player=player)
+

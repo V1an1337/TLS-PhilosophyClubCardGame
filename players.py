@@ -10,3 +10,4 @@ class player:
         newPhilosopher = philosopher(self)
         newPhilosopher.setPlayer(self)
         self.philosophers.append(newPhilosopher)
+        
