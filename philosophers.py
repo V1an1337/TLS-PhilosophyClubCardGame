@@ -24,6 +24,9 @@ class basicPhilosopher:
     def loseHP(self, hp: int):
         self.hp -= hp
 
+    def setHP(self, hp: int):
+        self.hp = hp
+
 
 class testPhilosopher(basicPhilosopher):
     def __init__(self, player: players.player):
