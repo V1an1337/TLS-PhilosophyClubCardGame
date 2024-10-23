@@ -43,6 +43,12 @@ class field:
     def getPlayer(self, id):
         return self.players[id - 1]  # id is 1-indexed
 
+    def getPlayers(self):
+        return self.players
+
+    def getCardManager(self):
+        return self.cardManager
+
 
 Field = field()
 
@@ -54,3 +60,4 @@ def getField() -> field:
 def setField(f):
     global Field
     Field = f
+    
