@@ -31,15 +31,28 @@ class field:
         self.players = []
 
     def startGame(self):
+        if self.state != 0:
+            return Exception("Game already started")
+        if len(self.getPlayers()) < 2:
+            return Exception("Not enough players")
+
         self.state = 1
+        return True
 
     def __getPlayerID(self):
         self.playerID += 1
         return self.playerID
 
-    def addPlayer(self, player: players.player):
+    def addPlayer(self, name):
+        if self.state != 0:
+            return Exception("Game already started")
+
+        player = players.player(name)
+        player_id = self.__getPlayerID()
+        player.playerID = player_id
+
         self.players.append(player)
-        return self.__getPlayerID()
+        return player_id
 
     def getPlayer(self, id):
         return self.players[id - 1]  # id is 1-indexed
@@ -61,4 +74,3 @@ def getField() -> field:
 def setField(f):
     global Field
     Field = f
-    

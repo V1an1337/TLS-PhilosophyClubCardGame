@@ -16,16 +16,27 @@ with open("configuration.cfg", "r") as config_file:
 Field = fields.getField()
 
 
-def handle_request(content):
+def handle_request(content, addr):
     message = json.loads(content)
 
     response = {"response": "Message received"}
 
-    if "action" in message:
-        if message["action"] == "start_game" and Field.state == 0:  # setting up
-            Field.startGame()
-            response = {"response": "Game started"}
+    if "admin" in message:
+        if message["admin"] == "start_game":  # setting up
+            start_game_result = Field.startGame()
+            if start_game_result == True:
+                response = {"response": "Game started"}
+            else:
+                response = {"response": "Failed", "reason": start_game_result.args}
+        if message["admin"] == "add_player":
+            name = message["name"]
+            add_player_result = Field.addPlayer(name)
+            if type(add_player_result) == int:
+                response = {"response": "Player added", "player": add_player_result}
+            else:
+                response = {"response": "Failed", "reason": add_player_result.args}
 
+    print(f"response to {addr}: {response}")
     return response
 
 
@@ -33,7 +44,7 @@ async def handle_client(websocket, path):
     async for message in websocket:
         addr = websocket.remote_address
         print(f"Received message: {message} from {addr}")
-        response = handle_request(message)
+        response = handle_request(message, addr)
         await websocket.send(json.dumps(response))
 
 
