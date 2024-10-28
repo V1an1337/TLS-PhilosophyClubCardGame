@@ -30,6 +30,7 @@ class field:
         self.playerID = 0
         self.players = []
 
+    def startGame(self):
         self.state = 1
 
     def __getPlayerID(self):

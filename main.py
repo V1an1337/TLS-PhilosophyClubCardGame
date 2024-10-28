@@ -16,10 +16,24 @@ with open("configuration.cfg", "r") as config_file:
 Field = fields.getField()
 
 
+def handle_request(content):
+    message = json.loads(content)
+
+    response = {"response": "Message received"}
+
+    if "action" in message:
+        if message["action"] == "start_game" and Field.state == 0:  # setting up
+            Field.startGame()
+            response = {"response": "Game started"}
+
+    return response
+
+
 async def handle_client(websocket, path):
     async for message in websocket:
-        print(f"Received message: {message}")
-        response = {"response": "Message received"}
+        addr = websocket.remote_address
+        print(f"Received message: {message} from {addr}")
+        response = handle_request(message)
         await websocket.send(json.dumps(response))
 
 
@@ -56,6 +70,12 @@ def Admin():
 
 async def Judge():
     print("Game is running...")
+
+    print("Game is waiting to start...")
+    while Field.state == 0:  # setup
+        await asyncio.sleep(1)
+
+    print("Game started")
     while Field.state == 1:
         # Perform game logic here
         await asyncio.sleep(1)  # Sleep for a short period to avoid busy waiting
@@ -68,7 +88,8 @@ async def Judge():
 async def main(port):
     global server
     # 同时运行WebSocket服务器和Judge函数
-    server = await websockets.serve(handle_client, "0.0.0.0", port)
+    address = "0.0.0.0"
+    server = await websockets.serve(handle_client, "localhost", port)
 
     judge_task = asyncio.create_task(Judge())
     Admin()
@@ -79,4 +100,3 @@ async def main(port):
 
 if __name__ == "__main__":
     asyncio.run(main(port=port))
-    
