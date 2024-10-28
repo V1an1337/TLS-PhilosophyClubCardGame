@@ -16,25 +16,25 @@ with open("configuration.cfg", "r") as config_file:
 Field = fields.getField()
 
 
-def handle_request(content, addr):
-    message = json.loads(content)
+def handle_request(message, addr):
+    message = json.loads(message)
 
     response = {"response": "Message received"}
 
     if "admin" in message:
         if message["admin"] == "start_game":  # setting up
-            start_game_result = Field.startGame()
-            if start_game_result == True:
+            start_game_result, content = Field.startGame()
+            if start_game_result:
                 response = {"response": "Game started"}
             else:
-                response = {"response": "Failed", "reason": start_game_result.args}
+                response = {"response": "Failed", "reason": content}
         if message["admin"] == "add_player":
             name = message["name"]
-            add_player_result = Field.addPlayer(name)
-            if type(add_player_result) == int:
-                response = {"response": "Player added", "player": add_player_result}
+            add_player_result, content = Field.addPlayer(name)
+            if add_player_result:
+                response = {"response": "Player added", "player": content}
             else:
-                response = {"response": "Failed", "reason": add_player_result.args}
+                response = {"response": "Failed", "reason": content}
 
     print(f"response to {addr}: {response}")
     return response
