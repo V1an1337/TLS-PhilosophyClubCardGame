@@ -9,6 +9,7 @@ class CustomError(Exception):
         super().__init__(message)
         self.details = details
 
+
 class cardManager:
     def __init__(self):
         self.cardID = 0
@@ -55,7 +56,7 @@ class field:
 
         player = players.player(name)
         player_id = self.__getPlayerID()
-        player.playerID = player_id
+        player.setPlayerID(player_id)
 
         self.players.append(player)
         return True, player_id

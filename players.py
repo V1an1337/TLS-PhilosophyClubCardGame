@@ -7,6 +7,9 @@ class player:
         self.philosophers = []
         self.playerID = -1
 
+    def setPlayerID(self,id):
+        self.playerID = id
+
     def addPhilosopher(self, philosopher):
         newPhilosopher = philosopher(self)
         newPhilosopher.setPlayer(self)
