@@ -3,12 +3,6 @@ import philosophers
 import players
 
 
-class CustomError(Exception):
-    def __init__(self, message, details=None):
-        self.message = message
-        super().__init__(message)
-        self.details = details
-
 class cardManager:
     def __init__(self):
         self.cardID = 0
@@ -29,7 +23,6 @@ class cardManager:
 class field:
     def __init__(self):
         self.state = 0  # [0: setup, 1: normal, -1: error]
-        self.cardPile: [cards.basicCard] = []
         self.graveYard: [cards.basicCard] = []
         self.cardManager = cardManager()
 
@@ -55,12 +48,12 @@ class field:
 
         player = players.player(name)
         player_id = self.__getPlayerID()
-        player.playerID = player_id
+        player.setPlayerID(player_id)
 
         self.players.append(player)
         return True, player_id
 
-    def getPlayer(self, id):
+    def getPlayer(self, id) -> players.player:
         return self.players[id - 1]  # id is 1-indexed
 
     def getPlayers(self):
