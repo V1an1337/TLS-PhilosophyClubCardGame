@@ -3,6 +3,12 @@ import philosophers
 import players
 
 
+class CustomError(Exception):
+    def __init__(self, message, details=None):
+        self.message = message
+        super().__init__(message)
+        self.details = details
+
 class cardManager:
     def __init__(self):
         self.cardID = 0
@@ -30,15 +36,29 @@ class field:
         self.playerID = 0
         self.players = []
 
+    def startGame(self):
+        if self.state != 0:
+            return False, "Game already started"
+        if len(self.getPlayers()) < 2:
+            return False, "Not enough players"
+
         self.state = 1
+        return True, self.state
 
     def __getPlayerID(self):
         self.playerID += 1
         return self.playerID
 
-    def addPlayer(self, player: players.player):
+    def addPlayer(self, name):
+        if self.state != 0:
+            return False, "Game already started"
+
+        player = players.player(name)
+        player_id = self.__getPlayerID()
+        player.playerID = player_id
+
         self.players.append(player)
-        return self.__getPlayerID()
+        return True, player_id
 
     def getPlayer(self, id):
         return self.players[id - 1]  # id is 1-indexed
@@ -60,4 +80,3 @@ def getField() -> field:
 def setField(f):
     global Field
     Field = f
-    

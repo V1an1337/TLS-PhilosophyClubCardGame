@@ -16,10 +16,35 @@ with open("configuration.cfg", "r") as config_file:
 Field = fields.getField()
 
 
+def handle_request(message, addr):
+    message = json.loads(message)
+
+    response = {"response": "Message received"}
+
+    if "admin" in message:
+        if message["admin"] == "start_game":  # setting up
+            start_game_result, content = Field.startGame()
+            if start_game_result:
+                response = {"response": "Game started"}
+            else:
+                response = {"response": "Failed", "reason": content}
+        if message["admin"] == "add_player":
+            name = message["name"]
+            add_player_result, content = Field.addPlayer(name)
+            if add_player_result:
+                response = {"response": "Player added", "player": content}
+            else:
+                response = {"response": "Failed", "reason": content}
+
+    print(f"response to {addr}: {response}")
+    return response
+
+
 async def handle_client(websocket, path):
     async for message in websocket:
-        print(f"Received message: {message}")
-        response = {"response": "Message received"}
+        addr = websocket.remote_address
+        print(f"Received message: {message} from {addr}")
+        response = handle_request(message, addr)
         await websocket.send(json.dumps(response))
 
 
@@ -37,6 +62,7 @@ def Admin():
             except Exception as e:
                 print(f"Error executing command: {e}")
             command_queue.task_done()
+        print(f"Admin terminal closed.")
 
     def write_commands():
         while True:
@@ -55,16 +81,26 @@ def Admin():
 
 async def Judge():
     print("Game is running...")
+
+    print("Game is waiting to start...")
+    while Field.state == 0:  # setup
+        await asyncio.sleep(1)
+
+    print("Game started")
     while Field.state == 1:
         # Perform game logic here
         await asyncio.sleep(1)  # Sleep for a short period to avoid busy waiting
 
     print("Game is over.")
+    server.close()
+    print("Server closed")
 
 
 async def main(port):
+    global server
     # 同时运行WebSocket服务器和Judge函数
-    server = await websockets.serve(handle_client, "0.0.0.0", port)
+    address = "0.0.0.0"
+    server = await websockets.serve(handle_client, "localhost", port)
 
     judge_task = asyncio.create_task(Judge())
     Admin()
@@ -75,4 +111,3 @@ async def main(port):
 
 if __name__ == "__main__":
     asyncio.run(main(port=port))
-    

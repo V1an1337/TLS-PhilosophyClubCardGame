@@ -5,6 +5,7 @@ class player:
     def __init__(self, name):
         self.name = name
         self.philosophers = []
+        self.playerID = -1
 
     def addPhilosopher(self, philosopher):
         newPhilosopher = philosopher(self)
