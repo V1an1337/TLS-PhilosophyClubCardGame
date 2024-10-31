@@ -1,4 +1,4 @@
-import cards, fields, players,effects
+import cards, fields, players, effects
 
 
 class basicPhilosopher:
@@ -8,6 +8,7 @@ class basicPhilosopher:
         self.description = description
         self.hp = 10
         self.energyCards: [cards.energyCard] = []
+        self.effects: [effects.basicEffect] = []
 
     def setPlayer(self, player: players.player):
         self.player = player
@@ -27,10 +28,23 @@ class basicPhilosopher:
     def setHP(self, hp: int):
         self.hp = hp
 
+    def addEffect(self, effect):
+        self.effects.append(effect)
+
+    def updateEffects(self):
+        new_effects = []
+        for effect in self.effects:
+            effect: effects.basicEffect
+
+            effect.update()
+            if effect.dead:  # 状态结束
+                continue
+
+            new_effects.append(effect)
+
 
 class testPhilosopher(basicPhilosopher):
     def __init__(self, player: players.player):
         self.name = "testPhilosopher"
         self.description = "This is a test."
         super().__init__(self.name, description=self.description, player=player)
-
