@@ -1,5 +1,9 @@
 import philosophers, cards, fields, effects
 
+Field = fields.getField()
+cardManager = Field.getCardManager()
+philosopherManager = Field.getPhilosopherManager()
+
 
 class player:
     def __init__(self, name):
@@ -14,10 +18,22 @@ class player:
             raise Exception("Player ID already set")
         self.playerID = id
 
-    def addPhilosopher(self, philosopher):
-        newPhilosopher = philosopher(self)
-        newPhilosopher.setPlayer(self)
+    def addPhilosopher(self, philosopher_type):
+        if philosopher_type not in philosopherManager.getPhilosopherTypes():
+            raise Exception("Invalid philosopher type")
+        if len(self.philosophers) >= 3:
+            raise Exception("Too many philosophers")
+
+        newPhilosopher = philosophers.PhilosopherTypeToPhilosopher(philosopher_type)()
+        philosopherManager.addPhilosopher(newPhilosopher, self)
         self.philosophers.append(newPhilosopher)
+
+    def getPhilosopher(self, id):
+        for philosopher in self.philosophers:
+            if philosopher.philosopherID == id:
+                return philosopher
+        raise Exception("Philosopher not found")
+
 
     def addCard(self, card):
         if card in self.cardPile:
@@ -28,3 +44,11 @@ class player:
         # This is only a unit test example, not a real implementation
         for i in range(5):
             self.addCard(cards.attackCard)
+
+    def chooseCard(self, cardID, philosopher: philosophers.basicPhilosopher, target):
+        card = cardManager.getCard(cardID)
+        if card not in self.cardPile:
+            raise Exception("Card not in pile")
+
+        philosopher.useCard(card, target)
+        self.cardPile.remove(card)

@@ -14,6 +14,8 @@ with open("configuration.cfg", "r") as config_file:
     port = config.get("port", 11001)  # 默认端口11001如果没有
 
 Field = fields.getField()
+CardManager = Field.getCardManager()
+PhilosopherManager = Field.getPhilosopherManager()
 
 
 def handle_request(message, addr):
@@ -35,6 +37,34 @@ def handle_request(message, addr):
                 response = {"response": "Player added", "player": content}
             else:
                 response = {"response": "Failed", "reason": content}
+    elif "action" in message:  # {"action":"useCard", "philosopherID": <philosopherID>,"cardID": <cardID>, "targetID": <targetID>}
+        if message["action"] == "useCard":
+            philosopher_id = message["philosopher_id"]  # 出牌哲学家ID
+            card_id = message["card_id"]  # 牌的ID
+            target_id = message["target_id"]  # 目标哲学家的ID
+            energy_cards = message["energy_cards"]  # 能量牌
+
+            # 检测是否合法
+            if not Field.checkValidCard(philosopher_id, card_id, target_id, energy_cards):  # 不合法 -> 返回error信息至客户端
+                response = {"response": "Invalid action"}
+            else:  # 若合法 -> 判断是否可入栈，假设所有牌只有一个人可以响应
+                philosopher = PhilosopherManager.getPhilosopher(philosopher_id)
+                target = PhilosopherManager.getPhilosopher(target_id)
+                card = CardManager.getCard(card_id)
+
+                # 检测是否可入栈
+                # 当前卡牌是否处理完毕，若非，检测当前处理牌是否能被此牌响应
+                if not Field.currentProcessingCard.finished:
+                    if not Field.currentProcessingCard.canBeRespondedBy(card):  # 若不能被响应，则返回error信息至客户端
+                        response = {"response": "Invalid action"}
+                    else:  # 若能被响应，则将此牌入栈，并设置当前处理牌为此牌
+                        Field.pushToCardStack(card)
+                else:  # 若处理完毕，则直接入栈，并设置当前处理牌为此牌
+                    Field.pushToCardStack(card)
+
+                # card.use 在更新为当前处理卡的时候立即调用， card 在当前处理卡结算完毕后入栈， 接收card的接口什么时候invalid？
+                # Field.当前处理卡 -> 单独一张Card
+                # card 入栈前 上一张card必须全部结算完毕，若是第一张或(可以响应当前牌并且可被响应的philosopher皆响应完毕)，则直接入栈，并将当前处理牌设置为此牌
 
     print(f"response to {addr}: {response}")
     return response
@@ -89,6 +119,10 @@ def startGameUnitTest():
     player1.addPhilosopher(philosophers.testPhilosopher)
     player2.addPhilosopher(philosophers.testPhilosopher)
 
+    for i in range(10):
+        player1.addCard(cards.attackCard())
+        player2.addCard(cards.attackCard())
+
     Field.startGame()
 
 
@@ -136,6 +170,16 @@ async def Judge():
         状态结算结束 - 未定义
         
         """
+
+        for currentPlayer in Field.getPlayers():
+            currentPlayer: players.player
+
+            for i in range(5):  # 等待出牌
+                await asyncio.sleep(1)
+
+            # 处理牌栈
+
+
         await asyncio.sleep(1)  # Sleep for a short period to avoid busy waiting
 
     print("Game is over.")
