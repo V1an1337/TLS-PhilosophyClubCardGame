@@ -33,7 +33,7 @@ class player:
             if philosopher.philosopherID == id:
                 return philosopher
         raise Exception("Philosopher not found")
-
+#
 
     def addCard(self, card):
         if card in self.cardPile:
