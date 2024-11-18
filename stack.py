@@ -37,4 +37,3 @@ if __name__ == "__main__":
     print(stack.peek())  # 输出: 2
     print(stack.size())  # 输出: 2
     print(stack.is_empty())  # 输出: False
-#

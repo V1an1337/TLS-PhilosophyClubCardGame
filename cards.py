@@ -16,7 +16,7 @@ class state(Enum):
 Field = fields.getField()
 CardManager = Field.getCardManager()
 PhilosopherManager = Field.getPhilosopherManager()
-#
+
 
 class basicCard:
     def __init__(self, name, description, cost: int):

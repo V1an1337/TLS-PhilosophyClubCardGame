@@ -121,7 +121,7 @@ class field:
         # 检测当前能量卡组合是否足够
         if not philosopher.checkValidEnergy(energyCards):
             return False, "Energy card combination is not valid"
-#
+
         return True, "Success"
 
     def pushToCardStack(self, card):

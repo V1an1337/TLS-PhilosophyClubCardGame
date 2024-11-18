@@ -32,7 +32,7 @@ class healEffect(basicEffect):
             self.turnsLeft -= 1
         else:
             self.destroy()
-#
+
 
 class damageEffect(basicEffect):
     def __init__(self, player, amount, turns):  # player 永远放在参数第一位

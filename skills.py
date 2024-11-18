@@ -1,7 +1,7 @@
 import philosophers
 import players, effects, fields, cards
 
-#
+
 class basicSkill:
     def __init__(self, name, description):
         self.name = name
