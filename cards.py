@@ -33,9 +33,11 @@ class basicCard:
 
         self.respondedCards = [] # 可以并只能响应此牌的卡（不包含无懈可击，转移目标等）
 
-    def use(self, attacker, target):
-        self.attacker = attacker
-        self.target = target
+    def use(self):
+        pass
+
+    def setAttackerandTarget(self, attacker, target):
+        self.attacker, self.target = attacker, target
 
     def canBeRespondedBy(self, card):
         if type(card) in self.respondedCards:
@@ -76,7 +78,7 @@ class basicCard:
 
     def using(self):  # 使用结算
         self.state = 5
-        self.use(self.attacker, self.target)
+        self.use()
         self.useEnd()
 
     def useEnd(self):  # 使用结算结束
@@ -112,7 +114,7 @@ class energyCard(basicCard):
     def reset(self):
         self.used = False
 
-    def use(self, attakcer=None, target=None):  # Add Energy card to philosopher
+    def use(self):  # Add Energy card to philosopher
         self.used = True
 
 
@@ -125,12 +127,9 @@ class hpCard(basicCard):
         super().__init__(self.name, self.description, self.cost)
         self.hp = hp
 
-    def use(self, attacker, target=None):
-        self.attacker = attacker
-        self.target = target
-        if not target:
-            target = attacker
-        skills.addHP(target)
+    def use(self):
+        print(f"hpCard {self} used by {self.attacker} to {self.target}!")
+        skills.addHP(self.target)
 
 
 class attackCard(basicCard):
@@ -143,10 +142,9 @@ class attackCard(basicCard):
 
         # self.canBeRespondedBy = [healCard]
 
-    def use(self, attacker, target):
-        self.attacker = attacker
-        self.target = target
-        skills.attack(attacker, target)
+    def use(self):
+        print(f"attackCard {self} used by {self.attacker} to {self.target}!")
+        skills.attack(self.attacker, self.target)
 
 
 class healCard(basicCard):
@@ -157,10 +155,6 @@ class healCard(basicCard):
     def __init__(self):
         super().__init__(self.name, self.description, self.cost)
 
-    def use(self, attacker, target=None):
-        self.attacker = attacker
-        self.target = target
-        if not target:
-            target = attacker
-        effect = effects.healEffect(target, 1, 3)
-        target.addEffect(effect)
+    def use(self):
+        effect = effects.healEffect(self.target, 1, 3)
+        self.target.addEffect(effect)

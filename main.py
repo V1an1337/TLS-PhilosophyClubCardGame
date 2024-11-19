@@ -48,13 +48,14 @@ def handle_request(message, addr):
             if not Field.checkValidCard(philosopher_id, card_id, target_id, energy_cards):  # 不合法 -> 返回error信息至客户端
                 response = {"response": "Invalid action"}
             else:  # 若合法 -> 判断是否可入栈，假设所有牌只有一个人可以响应
-                philosopher = PhilosopherManager.getPhilosopher(philosopher_id)
-                target = PhilosopherManager.getPhilosopher(target_id)
-                card = CardManager.getCard(card_id)
+                philosopher: philosophers.basicPhilosopher = PhilosopherManager.getPhilosopher(philosopher_id)
+                target: philosophers.basicPhilosopher = PhilosopherManager.getPhilosopher(target_id)
+                card: cards.basicCard = CardManager.getCard(card_id)
+                card.setAttackerandTarget(philosopher, target)
 
-                # 检测是否可入栈
-                # 当前卡牌是否处理完毕，若非，检测当前处理牌是否能被此牌响应
-                if not Field.currentProcessingCard.finished:
+                if Field.cardStack.is_empty() and Field.currentProcessingPlayer == philosopher.getPlayer():  # 当前玩家出牌阶段
+                    Field.pushToCardStack(card)
+                elif not Field.currentProcessingCard.finished:
                     if not Field.currentProcessingCard.canBeRespondedBy(card):  # 若不能被响应，则返回error信息至客户端
                         response = {"response": "Invalid action"}
                     else:  # 若能被响应，则将此牌入栈，并设置当前处理牌为此牌
@@ -173,12 +174,29 @@ async def Judge():
 
         for currentPlayer in Field.getPlayers():
             currentPlayer: players.player
+            Field.currentProcessingPlayer = currentPlayer
 
-            for i in range(5):  # 等待出牌
-                await asyncio.sleep(1)
+            print(f"现在是player {currentPlayer.name}的回合")
+
+            for i in range(10):  # 等待出牌
+                if Field.newCardPushed:  # 新的卡被打出
+                    print(f"有新的牌被打出")
+                    break
+                await asyncio.sleep(0.5)
+
+            print(f"等待出牌结束")
 
             # 处理牌栈
+            while not Field.cardStack.is_empty():
+                for i in range(10):  # 等待出牌
+                    if Field.newCardPushed:  # 新的卡被打出
+                        break
+                    await asyncio.sleep(0.5)
 
+                card: cards.basicCard = Field.cardStack.pop()  # 玩家出牌回合打出的卡或者是新的响应卡
+                print(f"这张牌是{card}, by {card.attacker.name}, 开始结算...")
+                card.useStart()
+                print(f"结算结束...")
 
         await asyncio.sleep(1)  # Sleep for a short period to avoid busy waiting
 

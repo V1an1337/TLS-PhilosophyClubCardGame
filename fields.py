@@ -55,8 +55,10 @@ class field:
         self.philosopherManager = philosopherManager()
 
         self.currentProcessingCard = None
-        # 创建一个栈
+        self.newCardPushed = False
+        self.currentProcessingPlayer = None
 
+        # 创建一个栈
         self.cardStack = Stack()
 
         self.playerID = 0
@@ -129,6 +131,7 @@ class field:
         self.cardStack.push(card)
         # 设置当前处理卡
         self.currentProcessingCard = card
+        self.newCardPushed = True
 
 
 Field = field()

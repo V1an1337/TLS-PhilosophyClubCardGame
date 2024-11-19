@@ -44,11 +44,3 @@ class player:
         # This is only a unit test example, not a real implementation
         for i in range(5):
             self.addCard(cards.attackCard)
-
-    def chooseCard(self, cardID, philosopher: philosophers.basicPhilosopher, target):
-        card = cardManager.getCard(cardID)
-        if card not in self.cardPile:
-            raise Exception("Card not in pile")
-
-        philosopher.useCard(card, target)
-        self.cardPile.remove(card)

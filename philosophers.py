@@ -14,9 +14,8 @@ class basicPhilosopher:
 
     def setID(self, id):
         self.id = id
-
-    def useCard(self, card: cards.basicCard, target=None):
-
+    def getPlayer(self):
+        return self.player
 
     def setPlayer(self, player: players.player):
         self.player = player
