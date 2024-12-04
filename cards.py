@@ -65,6 +65,8 @@ class basicCard:
 
     def becomedTarget(self):  # 成为目标后
         self.state = 3
+        self.useStart() # test usage
+
         if len(self.respondedCards) == 0:
             self.useStart()
         else:
@@ -91,6 +93,7 @@ class basicCard:
         # 若装备牌，则置入装备区
 
     def finish(self):
+        print(f"card {self.id} finished!")
         self.finished = True
 
 
@@ -99,18 +102,11 @@ class energyCard(basicCard):
     description = f"Give you N energy"
     cost = 0
 
-    def __init__(self, philosopher, energy):  # philosopher 永远放在参数第一位, player同理
+    def __init__(self, energy):  # 没有philosopher参数
 
         super().__init__(self.name, self.description, self.cost)
         self.energy = energy
-        self.philosopher = philosopher
         self.used = False
-
-    def add(self, target=None):
-        if not target:
-            target = self.philosopher
-        target.addEnergy(self)
-
     def reset(self):
         self.used = False
 

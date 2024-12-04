@@ -1,34 +1,39 @@
-# test for websocket communication
-
-import asyncio
 import websockets
+import asyncio
+import tkinter as tk
 import json
 
-
-async def connect_and_send(uri, message):
-    async with websockets.connect(uri) as websocket:
-        print(f"Connected to server at {uri}")
-
-        # Send message to the server
-        await websocket.send(json.dumps(message))
-        print(f"Sent message: {message}")
-
-        # Wait for a response from the server
-        response = await websocket.recv()
-        print(f"Received response: {response}")
-
-
+def decodeInfo(response):
+    round = response["round"]
+    print(f"-----currentRound = {round}-----\n")
+    players = response["players"]
+    for p in players:
+        name = p["name"]
+        cardPile = p["cardPile"]
+        validCardPile = p["validCardPile"]
+        print(f"Player {name} has cardPile:\n{cardPile},\nwith validCards: {validCardPile}")
+        philosophers = p["philosophers"]
+        print(f"Player {name} has philosophers: {philosophers}")
+        for ph in philosophers:
+            phil = philosophers[ph]
+            print(f"Philosopher {ph} has hp: {phil['hp']}\nenergyCards: {phil['energyCards']}\nvalidEnergyCards: {phil['validEnergyCards']}")
+        print()
+    print(f"-----currentRound = {round}-----\n")
 async def main():
-    # Set the WebSocket server URI based on the server's configuration
-    uri = "ws://localhost:11001"  # Adjust if the server is on a different host or port
+    async with websockets.connect('ws://localhost:11001') as websocket:
+        while True:
+            await websocket.send(json.dumps({"getInfo":"getInfo"}))
+            print("sent")
+            response = await websocket.recv()
+            print("received")
+            response = json.loads(response)
+            decodeInfo(response)
+            input()
 
-    # Define a message to send
-    message = {"admin": "start_game"}
-
-    # Connect and send message
-    await connect_and_send(uri, message)
-
-
-# Run the client
-if __name__ == "__main__":
-    asyncio.run(main())
+# start the server
+asyncio.get_event_loop().run_until_complete(main())
+# start the GUI
+root = tk.Tk()
+root.mainloop()
+# close the server
+asyncio.get_event_loop().close()

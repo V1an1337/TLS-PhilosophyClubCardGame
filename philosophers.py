@@ -13,6 +13,7 @@ class basicPhilosopher:
         self.effects: [effects.basicEffect] = []
 
     def setID(self, id):
+        print(f"philosopher {id} set")
         self.id = id
     def getPlayer(self):
         return self.player
@@ -20,25 +21,46 @@ class basicPhilosopher:
     def setPlayer(self, player: players.player):
         self.player = player
 
+    def reduceEnergy(self, energyCards: [int]):
+        print(f"reduceEnergy receive cards: {energyCards}")
+        # energyCards: 能量卡排列组合
+        energyCardsRemain = energyCards[:]
+        for energyCard in self.energyCards:
+            if energyCard.used:
+                continue
+            if energyCard.energy in energyCardsRemain:
+                energyCard.use()
+                energyCardsRemain.remove(energyCard.energy)
+                print(f"set energyCard {energyCard.id} used")
+
+        if len(energyCardsRemain) != 0:
+            print("False")
+            return False
+
+        print("True")
+        return True
+
+
     def checkValidEnergy(self, energyCards: [int]):
 
         # energyCards: 能量卡排列组合
         # 统计能量卡组合
         requiredEnergyCards = {}  # {1: 3} 三张1能量的卡 or {3: 1} 一张3能量的卡
-        for cost in energyCards:
-            if cost not in requiredEnergyCards:
-                requiredEnergyCards[cost] = 0
-            requiredEnergyCards[cost] += 1
+        for energy in energyCards:
+            if energy not in requiredEnergyCards:
+                requiredEnergyCards[energy] = 0
+            requiredEnergyCards[energy] += 1
 
         # 统计合法能量卡
         validEnergyCards = {}  # {1: 3, 2: 1, 3: 2}
         for energyCard in self.energyCards:
             if not energyCard.used:
-                if energyCard.cost not in validEnergyCards:
-                    validEnergyCards[energyCard.cost] = 0
-                validEnergyCards[energyCard.cost] += 1
+                if energyCard.energy not in validEnergyCards:
+                    validEnergyCards[energyCard.energy] = 0
+                validEnergyCards[energyCard.energy] += 1
 
         # 统计能量卡组合是否为合法能量卡的一个子集
+        print(f"requiredEnergyCards: {requiredEnergyCards}, valid: {validEnergyCards}")
         for cost in requiredEnergyCards:
             if (cost not in validEnergyCards) or validEnergyCards[cost] < requiredEnergyCards[cost]:
                 return False
@@ -82,4 +104,4 @@ class testPhilosopher(basicPhilosopher):
         super().__init__(self.name, description=self.description, player=player)
 
 
-PhilosopherTypeToPhilosopher = {"1": testPhilosopher}
+PhilosopherTypeToPhilosopher = {1: testPhilosopher}
