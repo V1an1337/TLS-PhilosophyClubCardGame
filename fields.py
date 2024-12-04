@@ -1,6 +1,4 @@
-import cards
-import philosophers
-import players
+from stack import Stack
 
 
 class cardManager:
@@ -14,10 +12,39 @@ class cardManager:
 
     def addCard(self, card) -> int:
         self.cards.append(card)
-        return self.__getCardID()
+        id = self.__getCardID()
+        return id
 
     def getCard(self, id):
+        if not (1 <= id <= len(self.cards)):
+            return None
         return self.cards[id - 1]  # id is 1-indexed
+
+
+class philosopherManager:
+    def __init__(self):
+        self.philosopherID = 0
+        self.philosophers = []
+
+    def __getPhilosopherID(self):
+        self.philosopherID += 1
+        return self.philosopherID
+
+    def addPhilosopher(self, philosopher, player):
+        self.philosophers.append(philosopher)
+        philosopher.setPlayer(player)
+        philosopher.setID(self.__getPhilosopherID())
+        print(f"Set id {philosopher.id} for philosopher {philosopher.name}")
+        return philosopher
+
+    def removePhilosopher(self, id):
+        # remove 不会把哲学家从列表中移出，而是invalid = True
+        self.philosophers[id - 1].invalid = True
+
+    def getPhilosopher(self, id):
+        if not (1 <= id <= len(self.philosophers)):
+            return None
+        return self.philosophers[id - 1]  # id is 1-indexed
 
 
 class field:
@@ -25,6 +52,15 @@ class field:
         self.state = 0  # [0: setup, 1: normal, -1: error]
         self.graveYard: [cards.basicCard] = []
         self.cardManager = cardManager()
+        self.philosopherManager = philosopherManager()
+
+        self.currentProcessingCard = None
+        self.newCardPushed = False
+        self.currentProcessingPlayer = None
+        self.nextRound = False
+
+        # 创建一个栈
+        self.cardStack = Stack()
 
         self.playerID = 0
         self.players = []
@@ -53,7 +89,7 @@ class field:
         self.players.append(player)
         return True, player_id
 
-    def getPlayer(self, id) -> players.player:
+    def getPlayer(self, id):
         return self.players[id - 1]  # id is 1-indexed
 
     def getPlayers(self):
@@ -61,6 +97,51 @@ class field:
 
     def getCardManager(self):
         return self.cardManager
+
+    def getPhilosopherManager(self):
+        return self.philosopherManager
+
+    def checkValidCard(self, philosopher_id, card_id, target_id, energyCards: [int]):  # 检测出牌是否合法
+
+        # 检测出牌哲学家
+        philosopher: philosophers.basicPhilosopher = self.philosopherManager.getPhilosopher(philosopher_id)
+        if not philosopher or philosopher.invalid:
+            return False, "Philosopher is invalid"
+        # 检测目标是否合法
+        target = self.philosopherManager.getPhilosopher(target_id)
+        if not target or target.invalid:
+            return False, "Target is invalid"
+        # 检测牌是否合法
+        card: cards.basicCard = self.cardManager.getCard(card_id)
+
+        if not card or card.finished or not philosopher.player.haveCard(card):
+            print(f"检测卡{card.name} with state {card.finished}")
+            return False, "Card is invalid"
+
+        # energyCards: 出牌组合 比如有哲学家拥有 [1,1,1,3] 想打出一张耗费3的卡，则可以选择使用 [1,1,1] 或 [3] 来打出，此变量表达了用户选择的能量卡组合
+        # 检测当前能量卡组合是否合法
+        print(f"检测能量卡组合with card{card.name} with energyCards {energyCards} and cost {card.cost}")
+        if not sum(energyCards) == card.cost:
+            return False, "Energy cards are invalid"
+        # 检测当前能量卡组合是否足够
+        if not philosopher.checkValidEnergy(energyCards):
+            return False, "Energy card combination is not valid"
+
+        return True, "Success"
+
+    def pushToCardStack(self, card, philosopher, energy_cards):
+        # 入栈
+        self.cardStack.push(card)
+        # 设置当前处理卡
+        self.currentProcessingCard = card
+        self.newCardPushed = True
+
+        # 减少能量卡
+        philosopher.reduceEnergy(energy_cards)
+
+    def passRound(self):
+        if self.cardStack.is_empty():
+            self.nextRound = True
 
 
 Field = field()
@@ -73,3 +154,8 @@ def getField() -> field:
 def setField(f):
     global Field
     Field = f
+
+
+import cards
+import philosophers
+import players

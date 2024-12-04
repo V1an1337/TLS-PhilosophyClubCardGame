@@ -43,9 +43,9 @@ class loseHP(basicSkill):
         target.loseHP(self.hp)
 
 
-class addEnergy(basicSkill):  # Add an N-Energy Card to player.
+class addEnergy(basicSkill):  # Add an N-Energy Card to philosopher.
     name = "Add Energy"
-    description = "Add a N-Energy Card to a player."
+    description = "Add a N-Energy Card to a philosopher."
 
     def __init__(self, philosopher, energy=1):
         super().__init__(self.name, self.description)
@@ -57,7 +57,7 @@ class addEnergy(basicSkill):  # Add an N-Energy Card to player.
     def use(self, target):
         target: philosophers.basicPhilosopher
         energyCard = cards.energyCard(target, self.energy)
-        energyCard.use()
+        energyCard.add()
 
 
 class attack(basicSkill):
